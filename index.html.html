@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sabores Tropicales | Tienda de Jugos</title>
+    <style>
+        :root {
+            --naranja: #ff7f11;
+            --naranja-brillo: #ff9f43;
+            --pina: #f1c40f;
+            --pina-oscura: #d4ac0d;
+            --gris-oscuro: #2c3e50;
+            --blanco: #ffffff;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #f9f9f9;
+            color: var(--gris-oscuro);
+            min-height: 100vh;
+        }
+
+        /* --- LOGO INTERACTIVO Y NAVBAR --- */
+        header {
+            background-color: var(--blanco);
+            padding: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+
+        .logo-container:hover {
+            transform: scale(1.05) rotate(-2deg);
+        }
+
+        .logo-icon {
+            font-size: 2.5rem;
+            margin-right: 10px;
+            animation: flotar 3s ease-in-out infinite;
+        }
+
+        .logo-text {
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: var(--naranja);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+        }
+
+        /* --- SECCIONES DE PRODUCTOS --- */
+        .main-container {
+            max-width: 1200px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+
+        .section-title {
+            text-align: center;
+            margin-bottom: 40px;
+            font-size: 2.5rem;
+            position: relative;
+        }
+
+        .section-title::after {
+            content: '';
+            display: block;
+            width: 80px;
+            height: 4px;
+            background-color: var(--naranja);
+            margin: 10px auto 0;
+            border-radius: 2px;
+        }
+
+        .grid-productos {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 40px;
+            margin-bottom: 60px;
+        }
+
+        .card-producto {
+            background: var(--blanco);
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.05);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .card-producto:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.12);
+        }
+
+        .img-box {
+            height: 250px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .img-box img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s ease;
+        }
+
+        .card-producto:hover .img-box img {
+            transform: scale(1.1);
+        }
+
+        .card-content {
+            padding: 25px;
+            text-align: center;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .card-content h3 {
+            font-size: 1.6rem;
+            margin-bottom: 10px;
+        }
+
+        .precio {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--gris-oscuro);
+            margin-bottom: 15px;
+        }
+
+        .btn-action {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 50px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+            margin: 5px;
+        }
+
+        .btn-info { background-color: #dfe6e9; color: var(--gris-oscuro); }
+        .btn-info:hover { background-color: #b2bec3; }
+
+        .btn-compra { color: white; }
+        .btn-orange { background-color: var(--naranja); }
+        .btn-orange:hover { background-color: #e66700; }
+        .btn-yellow { background-color: var(--pina); color: var(--gris-oscuro); }
+        .btn-yellow:hover { background-color: var(--pina-oscura); }
+
+        /* --- MODALES / VENTANAS EMERGENTES --- */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            backdrop-filter: blur(5px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+            z-index: 200;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .modal-box {
+            background: white;
+            padding: 30px;
+            border-radius: 20px;
+            max-width: 500px;
+            width: 90%;
+            text-align: center;
+            transform: scale(0.8);
+            transition: transform 0.3s ease;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+        }
+
+        .modal-overlay.active .modal-box {
+            transform: scale(1);
+        }
+
+        .modal-box h2 {
+            margin-bottom: 15px;
+            font-size: 2rem;
+        }
+
+        .modal-box p {
+            color: #636e72;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+
+        .btn-close {
+            background-color: var(--gris-oscuro);
+            color: white;
+            border: none;
+            padding: 10px 25px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        /* --- PÁGINA DE GRACIAS --- */
+        .pantalla-gracias {
+            display: none;
+            text-align: center;
+            padding: 60px 20px;
+            background: white;
+            border-radius: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+            max-width: 600px;
+            margin: 40px auto;
+            animation: entradaSuave 0.5s ease-out;
+        }
+
+        .pantalla-gracias h1 {
+            color: var(--naranja);
+            font-size: 3rem;
+            margin-bottom: 20px;
+        }
+
+        .icon-success {
+            font-size: 5rem;
+            margin-bottom: 20px;
+            display: inline-block;
+            animation: flotar 2s ease-in-out infinite;
+        }
+
+        /* --- ANIMACIONES --- */
+        @keyframes flotar {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+            100% { transform: translateY(0px); }
+        }
+
+        @keyframes entradaSuave {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @media (max-width: 768px) {
+            .grid-productos { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Encabezado con Logo Interactivo -->
+    <header>
+        <div class="logo-container" onclick="resetearVista()">
+            <span class="logo-icon">🍊</span>
+            <h1 class="logo-text">Sabores Tropicales</h1>
+        </div>
+    </header>
+
+    <main class="main-container" id="contenido-principal">
+        
+        <!-- Sección 1: Jugo de Naranja -->
+        <section>
+            <h2 class="section-title">Nuestra Selección Cítrica</h2>
+            <div class="grid-productos">
+                <article class="card-producto">
+                    <div class="img-box">
+                        <img src="https://images.unsplash.com/photo-1611080626919-7cf5a9dbab5b?auto=format&fit=crop&w=600&q=80" alt="Jugo de Naranja">
+                    </div>
+                    <div class="card-content">
+                        <h3>Jugo de Naranja Natural</h3>
+                        <p class="precio">15 Lps.</p>
+                        <div>
+                            <button class="btn-action btn-info" onclick="abrirModal('naranja')">Ver Detalles</button>
+                            <button class="btn-action btn-compra btn-orange" onclick="procesarCompra('Jugo de Naranja')">Comprar Ahora</button>
+                        </div>
+                    </div>
+                </article>
+            </div>
+        </section>
+
+        <!-- Sección 2: Jugo de Piña -->
+        <section>
+            <h2 class="section-title">Nuestra Selección Tropical</h2>
+            <div class="grid-productos">
+                <article class="card-producto">
+                    <div class="img-box">
+                        <img src="https://images.unsplash.com/photo-1550258987-190a2d41a8ba?auto=format&fit=crop&w=600&q=80" alt="Jugo de Piña">
+                    </div>
+                    <div class="card-content">
+                        <h3>Jugo de Piña Premium</h3>
+                        <p class="precio">15 Lps.</p>
+                        <div>
+                            <button class="btn-action btn-info" onclick="abrirModal('pina')">Ver Detalles</button>
+                            <button class="btn-action btn-compra btn-yellow" onclick="procesarCompra('Jugo de Piña')">Comprar Ahora</button>
+                        </div>
+                    </div>
+                </article>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Pantalla de Gracias (Sección Dinámica) -->
+    <section class="pantalla-gracias" id="seccion-gracias">
+        <span class="icon-success">🍹🎉</span>
+        <h1>¡Muchas Gracias!</h1>
+        <p style="font-size: 1.2rem; margin-bottom: 20px;" id="texto-confirmacion"></p>
+        <p style="color: #7f8c8d; margin-bottom: 30px;">Tu orden está siendo procesada por nuestros expertos tropicales. ¡Disfruta la frescura!</p>
+        <button class="btn-action btn-orange btn-compra" onclick="resetearVista()">Volver a la tienda</button>
+    </section>
+
+    <!-- Ventanas Emergentes (Modales de Detalles) -->
+    <div class="modal-overlay" id="modal-naranja">
+        <div class="modal-box">
+            <h2>🍊 Naranja 100% Pura</h2>
+            <p>Extraído de las mejores naranjas seleccionadas. Sin azúcares añadidos, alto contenido de Vitamina C natural. Ideal para empezar tus mañanas con toda la energía tropical.</p>
+            <button class="btn-close" onclick="cerrarModales()">Entendido</button>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="modal-pina">
+        <div class="modal-box">
+            <h2>🍍 Piña Honey Gold</h2>
+            <p>Nuestra piña madurada al sol ofrece una textura suave, dulce y sumamente refrescante. Contiene enzimas naturales que ayudan a tu digestión de forma deliciosa.</p>
+            <button class="btn-close" onclick="cerrarModales()">Entendido</button>
+        </div>
+    </div>
+
+    <!-- PROGRAMACIÓN / LOGICA JS -->
+    <script>
+        function abrirModal(producto) {
+            document.getElementById(`modal-${producto}`).classList.add('active');
+        }
+
+        function cerrarModales() {
+            const modales = document.querySelectorAll('.modal-overlay');
+            modales.forEach(modal => modal.classList.remove('active'));
+        }
+
+        window.onclick = function(event) {
+            if (event.target.classList.contains('modal-overlay')) {
+                cerrarModales();
+            }
+        }
+
+        function procesarCompra(nombreProducto) {
+            document.getElementById('contenido-principal').style.display = 'none';
+            document.getElementById('texto-confirmacion').innerText = `Tu compra de "${nombreProducto}" por 15 Lps. ha sido procesada con éxito.`;
+            document.getElementById('seccion-gracias').style.display = 'block';
+            window.scrollTo({top: 0, behavior: 'smooth'});
+        }
+
+        function resetearVista() {
+            document.getElementById('seccion-gracias').style.display = 'none';
+            document.getElementById('contenido-principal').style.display = 'block';
+        }
+    </script>
+</body>
+</html>
